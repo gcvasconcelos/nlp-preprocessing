@@ -89,3 +89,21 @@ dict_example = {
 }
 
 replace_target(example_df, 'NCM', dict_example)
+          
+# %%
+def sample_target(df, target_column, min_obs):
+    classes_dist = df[target_column].value_counts().reset_index().rename(columns={
+        'index': target_column
+        , target_column: 'NUM_AMOSTRAS'
+    })
+
+    classe_outros = classes_dist[classes_dist['NUM_AMOSTRAS'] <= min_obs][target_column]
+    print(f"Número de classes com menos de {min_obs} amostras : {len(classe_outros)}\nNúmero de classes final: {len(classes_dist)-len(classe_outros)}")
+
+    nome_amostra = target_column + '_AMOSTRA'
+    df[nome_amostra] = df[target_column]
+    df.loc[df[nome_amostra].isin(classe_outros), nome_amostra] = "OUTROS"
+
+    print(df[nome_amostra].value_counts())
+
+sample_target(example_df, 'NCM', 5000)
